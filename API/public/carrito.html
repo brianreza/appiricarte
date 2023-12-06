@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Carrito de Compras</title>
+    <style>
+      body {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-family: 'Arial', sans-serif;
+      }
+
+      h1 {
+        color: #007bff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      #carritoContainer {
+        margin-top: 20px;
+      }
+
+      .productoCarrito img {
+        width: 50%; /* Ajusta el ancho de la imagen al 50% del contenedor */
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      p.text-right {
+        font-size: 1.2em;
+        margin-top: 10px;
+      }
+
+      button.btn-primary,
+      a.btn-secondary {
+        background-color: #007bff;
+        border: none;
+      }
+
+      button.btn-primary:hover,
+      a.btn-secondary:hover {
+        background-color: #0056b3;
+      }
+
+      button.btn-primary a,
+      a.btn-secondary {
+        text-decoration: none;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container my-4">
+      <h1 class="text-center">Carrito de Compras</h1>
+
+      <div id="carritoContainer" class="row">
+        <!-- Aquí se mostrarán los productos del carrito -->
+      </div>
+
+      <p class="text-right">Total: $<span id="total"></span></p>
+
+      <div class="text-center my-4">
+        <button onclick="confirmarPago()" class="btn btn-primary"><a href="formulario.html" class="text-white">Generar PDF</a></button>
+        <a class="btn btn-secondary" href="index.html">Regresar</a>
+      </div>
+    </div>
+
+
+    
+    <script>
+      window.onload = function () {
+        fetch('/verCarrito')
+          .then(response => response.json())
+          .then(data => mostrarCarrito(data));
+      };
+
+      function mostrarCarrito(carrito) {
+  var carritoContainer = document.getElementById("carritoContainer");
+  carritoContainer.innerHTML = ''; // Limpiar el contenedor
+
+  // Crear elementos para cada producto del carrito y agregarlos al contenedor
+  carrito.productos.forEach(producto => {
+    var productoElement = document.createElement("div");
+    productoElement.classList.add("productoCarrito");
+
+    var imagenElement = document.createElement("img");
+    imagenElement.src = `/${producto.imagen}`;
+    imagenElement.alt = producto.nombre;
+
+    var nombreElement = document.createElement("h2");
+    nombreElement.textContent = producto.nombre;
+
+    var precioElement = document.createElement("p");
+    precioElement.textContent = `Precio: $${producto.precio}`;
+
+    var eliminarButton = document.createElement("button");
+    eliminarButton.textContent = "Eliminar";
+    eliminarButton.onclick = function () {
+      eliminarProducto(producto.nombre);
+    };
+
+    productoElement.appendChild(imagenElement);
+    productoElement.appendChild(nombreElement);
+    productoElement.appendChild(precioElement);
+    productoElement.appendChild(eliminarButton);
+
+    carritoContainer.appendChild(productoElement);
+  });
+
+  // Mostrar el total
+  var totalElement = document.getElementById("total");
+  totalElement.textContent = carrito.total;
+}
+
+      function eliminarProducto(nombre) {
+  fetch('/eliminarProducto', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ producto: { nombre: nombre } }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.mensaje);
+      window.location.reload(); // Recarga la página para reflejar los cambios
+    });
+}
+
+
+
+      function confirmarPago() {
+        fetch('/confirmarPago', {
+          method: 'POST'
+        })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.mensaje);
+            window.location.href = '/';
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+/* Estilos personalizados para ajustar el tamaño de las imágenes */
+.producto img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Estilos de los botones */
+button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #007bff;
+  color: white;
+}
+div.dib {
+  text-align: left;
+  margin: 10px; /* Ajusta según sea necesario */
+  padding: 10px; /* Ajusta según sea necesario */
+  border: 1px solid #ccc; /* Borde opcional para visualización */
+}
+
+/* Estilos de los enlaces */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos de los contenedores */
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Fondo para el cuerpo */
+body {
+  background-color: #f5f5f5; /* Puedes cambiar este color según tus preferencias */
+  margin: 0;
+  padding: 0;
+}
+
+/* Mejoras en el encabezado */
+h1 {
+  color: #007bff;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+/* Mejoras en el cuerpo de los productos */
+.producto {
+  width: 200px;
+  margin: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: inline-block; /* Añadido para mostrar los productos en línea */
+}
+
+

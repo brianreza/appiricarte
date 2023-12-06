@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <title>Catálogo de Productos</title>
+</head>
+
+
+
+<!-- CATALOGO DE LOS PRODUCTOS -->
+
+<body>
+  <div >
+    <h1>Catálogo de Productos</h1>
+
+    <div >
+      <label for="categorias">Selecciona una categoría:</label>
+      <select id="categorias" onchange="cambiarCategoria()">
+        <option value="memoriasRAM">Memorias RAM</option>
+        <option value="laptops">Laptops</option>                         <!--catalogo de proddcustos por categorias -->
+        <option value="graficas">Gráficas</option>
+        <option value="discosSolidos">Discos Sólidos</option>
+      </select>
+    </div>
+
+    <div id="productoContainer" class="row">
+    </div>
+
+    <div id="carritoButton" class="text-center my-4">
+      <button  onclick="verCarrito()">Ver Carrito</button>   <!--boton para ir a carrito-->
+    </div> <br><br>
+
+    <div  id="register">
+      <button onclick="verRegistro()">Ver Registros</button>  <!--ver los registros de tickets -->
+    </div>
+
+  </div>
+
+
+<!-- NUEVO PRODUCTO PARA ANADIR -->
+
+
+  <div class="dib" role="document">
+    <div >
+      <div >
+        <h3>Añadir Nuevo Producto</h3>
+        </button>
+      </div>
+      <div >
+        <form id="nuevoProductoForm">
+          <div >
+            <label for="nombre">Nombre del Producto:</label> 
+            <input type="text" id="nombre" required>
+          </div> <br>
+          <div>
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" required>
+              <option value="memoriasRAM">Memorias RAM</option>
+              <option value="laptops">Laptops</option>
+              <option value="graficas">Gráficas</option>
+              <option value="discosSolidos">Discos Sólidos</option>
+            </select> 
+          </div><br>
+          <div >
+            <label for="precio">Precio:</label>
+            <input type="number" class="form-control" id="precio" required>
+          </div><br>
+          <div>
+            <label for="imagen">URL de la Imagen:</label>
+            <input type="text" id="imagen" required>
+          </div>
+          <br>
+          <button type="button" onclick="agregarNuevoProducto()">Añadir Producto</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- EL FOOTER DE LA PAGINa-->
+  <footer>s
+    <div class="container">
+      <span class="text-muted">© 2023 Leyzen Tech </span>
+    </div>
+  </footer>
+
+  <script> //funciones de java 
+
+function abrirNuevoProductoModal() {   // abrir el neuvo producto anadido
+  $('#nuevoProductoModal').modal('show');
+}
+
+
+
+//funcion apra anadir un nuevo prducto al catalogo de carticulos 
+
+function agregarNuevoProducto() {
+  const nombre = document.getElementById('nombre').value;
+  const categoria = document.getElementById('categoria').value;
+  const precio = parseFloat(document.getElementById('precio').value);
+  const imagen = document.getElementById('imagen').value;
+
+  if (!nombre || !categoria || isNaN(precio) || !imagen) {
+    alert('Por favor, complete todos los campos correctamente.');
+    return;
+  }
+
+  const nuevoProducto = { tipo: nombre, precio, imagen };
+
+  fetch(`/catalogo/${categoria}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ producto: nuevoProducto }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.mensaje);
+      $('#nuevoProductoModal').modal('hide');
+      cambiarCategoria();
+    })
+    .catch(error => console.error('Error al agregar el nuevo producto:', error));
+}
+
+
+
+//funcion que permite camibar la categoria de producto apra ver uno u otro 
+
+
+    function cambiarCategoria() {
+      var categoriaSeleccionada = document.getElementById("categorias").value;
+
+      // llama ala categoriq seleccionada 
+      fetch(`/catalogo/${categoriaSeleccionada}`)
+      .then(response => response.json())
+      .then(data => mostrarProductos(data, categoriaSeleccionada));
+  }
+
+    function mostrarProductos(productos, categoria) {
+      var productoContainer = document.getElementById("productoContainer");
+      productoContainer.innerHTML = ''; // Limpiar el contenedor
+
+      // Crear elementos para cada producto y agregarlos al contenedor
+      productos.forEach(producto => {
+        var productoElement = document.createElement("div");
+        // Utilizando clases de Bootstrap para mejorar el diseño del producto
+        productoElement.classList.add("producto", "col-md-4", "mb-4");
+        productoElement.innerHTML = `
+          <img src="/${producto.imagen}" alt="${producto.tipo || producto.modelo || producto.capacidad}" class="img-fluid">
+          <h2>${producto.tipo || producto.modelo || producto.capacidad}</h2>
+          <p>Precio: $${producto.precio}</p>
+          <button class="btn btn-success" onclick="comprarProducto('${categoria}', '${producto.tipo || producto.modelo || producto.capacidad}', '${producto.imagen}')">Comprar</button>
+          <button class="btn btn-info" onclick="agregarAlCarrito('${categoria}', '${producto.tipo || producto.modelo || producto.precio || producto.capacidad}', '${producto.imagen}')">Agregar al carrito</button>
+        `;
+        productoContainer.appendChild(productoElement);
+      });
+    }
+
+
+    //funcion para comprar producto
+
+    function comprarProducto(categoria, producto, imagen) {
+      agregarAlCarrito(categoria, producto, imagen);
+      alert(`¡Has comprado ${producto} de la categoría ${categoria}!`);
+    }
+
+
+//agrega el producto seleccionado al carrotp 
+
+
+    function agregarAlCarrito(categoria, producto, imagen) {
+      fetch('/carrito', {
+        method: 'POST', //usando meotod post 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ producto: { categoria, ...producto, imagen } })
+      })
+        .then(response => response.json())
+        .then(data => alert(data.mensaje));
+    }
+
+
+
+    function verCarrito() {
+      // ir a carrito.htl
+      window.location.href = '/carrito.html';
+    }
+
+
+
+    function verRegistro() {
+      // ver los registros de tickets 
+      window.location.href = '/registros.html';
+    }
+
+
+
+    // Cargar el primer producto al cargar la página
+    window.onload = function () {
+      cambiarCategoria();
+    };
+
+  </script>
+</body>
+</html>
